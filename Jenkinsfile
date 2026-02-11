@@ -8,15 +8,14 @@ pipeline {
     stages {
 
         stage('Clone Repository') {
-    steps {
-        git branch: 'main', url: 'https://github.com/laibazahid085/devops-project.git'
-    }
-}
-
+            steps {
+                git branch: 'main', url: 'https://github.com/laibazahid085/devops-project.git'
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
 
@@ -24,8 +23,8 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                        sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push ${DOCKER_IMAGE}"
+                        bat 'echo %PASS% | docker login -u %USER% --password-stdin'
+                        bat 'docker push %DOCKER_IMAGE%'
                     }
                 }
             }
@@ -33,8 +32,8 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
+                bat 'kubectl apply -f deployment.yaml'
+                bat 'kubectl apply -f service.yaml'
             }
         }
 
@@ -42,10 +41,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully'
+            echo 'Pipeline completed successfully ✅'
         }
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed ❌'
         }
     }
 }
