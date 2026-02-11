@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'laibazahid085/devops-project'
-        KUBECONFIG = '/home/jenkins/.kube/config' 
+    }
 
     stages {
 
@@ -21,9 +21,11 @@ pipeline {
 
         stage('Docker Login & Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh "docker push ${DOCKER_IMAGE}"
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh 'echo $PASS | docker login -u $USER --password-stdin'
+                        sh "docker push ${DOCKER_IMAGE}"
+                    }
                 }
             }
         }
@@ -39,11 +41,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully ✅'
+            echo 'Pipeline completed successfully'
         }
         failure {
-            echo 'Pipeline failed ❌'
+            echo 'Pipeline failed'
         }
     }
-}
 }
